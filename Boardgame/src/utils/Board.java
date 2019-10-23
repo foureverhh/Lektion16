@@ -11,6 +11,7 @@ public class Board {
     JPanel controlPanel;
     JScrollPane scrollPane;
     JPanel gameZone;
+    JButton[][] board;
 
     Board(){
 
@@ -22,7 +23,8 @@ public class Board {
 
         //Print game zone
         gameZone = new JPanel();
-        printBoard(4);
+        board = printBoard(4);
+        shuffleBoard(board);
         scrollPane = new JScrollPane(gameZone);
 
         //Print control zone
@@ -44,7 +46,7 @@ public class Board {
         Board board = new Board();
     }
 
-    public void printBoard(int rows){
+    public JButton[][] printBoard(int rows){
         gameZone.setLayout(new GridLayout(rows,rows));
         int number = rows * rows;
         JButton[][] board = new JButton[rows][rows];
@@ -56,8 +58,25 @@ public class Board {
                     board[i][j] = new JButton();
                 }
                     board[i][j].setPreferredSize(new Dimension(100, 100));
-                    gameZone.add(board[i][j]);
+                //to show shuffled board
+                //gameZone.add(board[i][j]);
+            }
+        }
+        return board;
+    }
 
+
+    public void shuffleBoard(JButton[][] board){
+        for (int i = board.length-1; i >=0 ; i--) {
+            for (int j =board.length-1; j >=0 ; j--) {
+                int index1 = (int) (Math.random()*i);
+                int index2 = (int) (Math.random()*j);
+                System.out.println(i+" "+j+" "+index1+" "+index2);
+                //String temp = board[i][j].getText();
+                JButton temp = board[i][j];
+                board[i][j] = board[index1][index2];
+                board[index1][index2] = temp;
+                gameZone.add(board[i][j]);
             }
         }
     }
