@@ -23,7 +23,7 @@ public class Board {
         controlPanel.add(reStart);
 
         frame.add(controlPanel);
-        frame.setSize(800,800);
+        frame.setSize(1000,1000);
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setVisible(true);
