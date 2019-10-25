@@ -1,13 +1,16 @@
-package utils;
+package viewmodel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-public class Board {
+public class Board implements ActionListener {
     private JFrame frame;
     private JLabel label;
     private JTextField rowsInput;
     private JButton newGame;
+    private JButton reset;
     private JPanel controlPanel;
     private JScrollPane scrollPane;
     private JPanel gameZone;
@@ -15,39 +18,53 @@ public class Board {
     private JButton[] boardSingle;
     private int rows = 4;
 
-    Board(){
+    public Board(){
 
         frame = new JFrame("Enjoy the game!");
         label = new JLabel("Input rows:");
-        rowsInput = new JTextField(20);
+        rowsInput = new JTextField(10);
         newGame = new JButton("New Game");
+        reset = new JButton("Reset");
         controlPanel = new JPanel();
         //Print control zone
         controlPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
         controlPanel.add(label);
         controlPanel.add(rowsInput);
+        controlPanel.add(reset);
         controlPanel.add(newGame);
 
         //Print game zone
         gameZone = new JPanel();
-        gameZone.setLayout(new GridLayout(rows,rows));
+        boardSingle = printBoardByArray(rows);
+        //gameZone.setLayout(new GridLayout(rows,rows));
         //board = printBoardByTwoDimensionalArray(4);
         //shuffleBoardTwoDimensional(board);
 
+        reset.addActionListener(l->{
 
-
-        boardSingle = printBoardByArray(rows);
-        newGame.addActionListener(l -> {
-            try {
+                rows = Integer.parseInt(rowsInput.getText());
+                //gameZone.setLayout(new GridLayout(rows,rows));
+                //boardSingle.clear();
+                gameZone.removeAll();
+                boardSingle = printBoardByArray(rows);
                 gameZone.revalidate();
+
+                System.out.println("rows:"+rows);
+        });
+
+        newGame.addActionListener(l -> {
+
+
+                //gameZone.setLayout(new GridLayout(rows,rows));
                 shuffleBoardByArray(boardSingle);
 
-            }catch (Exception e){
+  /*          }catch (Exception e){
                 JOptionPane.showMessageDialog(null,
                         "Only integer allowed",
                         "Warning",
                         JOptionPane.WARNING_MESSAGE);
             }
+            */
         });
         scrollPane = new JScrollPane(gameZone);
 
@@ -65,11 +82,15 @@ public class Board {
     }
 
     public JButton[] printBoardByArray(int rows){
-       // gameZone.setLayout(new GridLayout(rows,rows));
-        JButton[] boardSingle = new JButton[rows*rows];
+        gameZone.setLayout(new GridLayout(rows,rows));
+        boardSingle = new JButton[rows*rows];
+        System.out.println(boardSingle.length);
+        //To make board repaint for reset
+        gameZone.repaint();
         for (int i = 0; i < boardSingle.length-1 ; i++) {
             //if(i!= boardSingle.length-1)
                 boardSingle[i] = new JButton(""+(i+1));
+                boardSingle[i].addActionListener(this);
        /*     else {
                 boardSingle[i] = new JButton();
                 boardSingle[i].setOpaque(true);
@@ -82,7 +103,8 @@ public class Board {
 
     public void shuffleBoardByArray(JButton[] boardSingle){
         //System.out.println();
-
+        //For gameZone to refresh
+        gameZone.revalidate();
         while (true) {
             for (int i = boardSingle.length - 1 - 1; i >= 0; i--) {
                 int index = (int) (Math.random() * i);
@@ -100,8 +122,7 @@ public class Board {
                 break;
             }
         }
-
-        System.out.println(boardSingle.length);
+        //System.out.println(boardSingle.length);
     }
 
     public int inversion (JButton[] boardSingle){
@@ -146,6 +167,27 @@ public class Board {
                 board[i][j] = board[index1][index2];
                 board[index1][index2] = temp;
                 gameZone.add(board[i][j]);
+            }
+        }
+    }
+
+    public JButton[] getBoardSingle() {
+        return boardSingle;
+    }
+
+    public int getRows() {
+        return rows;
+    }
+
+    public JPanel getGameZone() {
+        return gameZone;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        for(JButton button : boardSingle){
+            if(e.getSource()==button){
+                button.setForeground(Color.RED);
             }
         }
     }
