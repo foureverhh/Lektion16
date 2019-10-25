@@ -14,7 +14,7 @@ public class Board implements ActionListener {
     private JPanel controlPanel;
     private JScrollPane scrollPane;
     private JPanel gameZone;
-    private JButton[][] board;
+    private JButton[][] buttonsInDimensionalArray;
     private JButton[] boardSingle;
     private int rows = 4;
 
@@ -119,6 +119,8 @@ public class Board implements ActionListener {
             //polarity in two dimensional system
             int polarity = ((rows-1)+(rows-1))%2;
             if(inversion==polarity){
+                //Store JButton array to JButton[][]
+                storeInTwoDimensionalArray(boardSingle);
                 break;
             }
         }
@@ -190,5 +192,20 @@ public class Board implements ActionListener {
                 button.setForeground(Color.RED);
             }
         }
+    }
+
+    public void storeInTwoDimensionalArray(JButton[] buttonArray){
+        buttonsInDimensionalArray = new JButton[rows][rows];
+        for (int i = 0; i <rows ; i++) {
+            for (int j = 0; j < rows; j++) {
+                buttonsInDimensionalArray[i][j] = buttonArray[rows*i+j];
+                if(i!=(rows-1)||j!=(rows-1))
+                    System.out.println("["+i+"] ["+j+"]"+buttonsInDimensionalArray[i][j].getText());
+            }
+        }
+    }
+
+    public JButton[][] getButtonsInDimensionalArray() {
+        return buttonsInDimensionalArray;
     }
 }
