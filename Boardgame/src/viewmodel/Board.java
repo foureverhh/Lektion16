@@ -5,7 +5,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class Board implements ActionListener {
+public class Board  implements ActionListener {
     private JFrame frame;
     private JLabel label;
     private JTextField rowsInput;
@@ -14,11 +14,11 @@ public class Board implements ActionListener {
     private JPanel controlPanel;
     private JScrollPane scrollPane;
     private JPanel gameZone;
-    private JButton[][] buttonsInDimensionalArray;
+    private JButton[][] buttons;
     private JButton[] boardSingle;
     private int rows = 4;
 
-    public Board(){
+    public Board() {
 
         frame = new JFrame("Enjoy the game!");
         label = new JLabel("Input rows:");
@@ -26,26 +26,25 @@ public class Board implements ActionListener {
         newGame = new JButton("New Game");
         reset = new JButton("Reset");
         controlPanel = new JPanel();
-        //Print control zone
+
+        //Add control zone
         controlPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
         controlPanel.add(label);
         controlPanel.add(rowsInput);
         controlPanel.add(reset);
         controlPanel.add(newGame);
 
-        //Print game zone
+        //Add game zone
         gameZone = new JPanel();
+
+        //Print all ordered buttons
         boardSingle = printBoardByArray(rows);
-        //gameZone.setLayout(new GridLayout(rows,rows));
-        //board = printBoardByTwoDimensionalArray(4);
-        //shuffleBoardTwoDimensional(board);
 
-        reset.addActionListener(l->{
-
+        reset.addActionListener(l -> {
                 rows = Integer.parseInt(rowsInput.getText());
-                //gameZone.setLayout(new GridLayout(rows,rows));
-                //boardSingle.clear();
+                //Remove all old buttons
                 gameZone.removeAll();
+                //Reprint all new buttons
                 boardSingle = printBoardByArray(rows);
                 gameZone.revalidate();
 
@@ -53,19 +52,12 @@ public class Board implements ActionListener {
         });
 
         newGame.addActionListener(l -> {
-
-
-                //gameZone.setLayout(new GridLayout(rows,rows));
                 shuffleBoardByArray(boardSingle);
-
-  /*          }catch (Exception e){
-                JOptionPane.showMessageDialog(null,
-                        "Only integer allowed",
-                        "Warning",
-                        JOptionPane.WARNING_MESSAGE);
-            }
-            */
+                //Store JButton array to JButton[][]
+                storeInTwoDimensionalArray(boardSingle);
+            gameZone.revalidate();
         });
+
         scrollPane = new JScrollPane(gameZone);
 
         frame.setLayout(new BorderLayout());
@@ -90,7 +82,7 @@ public class Board implements ActionListener {
         for (int i = 0; i < boardSingle.length-1 ; i++) {
             //if(i!= boardSingle.length-1)
                 boardSingle[i] = new JButton(""+(i+1));
-                boardSingle[i].addActionListener(this);
+                //boardSingle[i].addActionListener(this);
        /*     else {
                 boardSingle[i] = new JButton();
                 boardSingle[i].setOpaque(true);
@@ -102,25 +94,29 @@ public class Board implements ActionListener {
     }
 
     public void shuffleBoardByArray(JButton[] boardSingle){
-        //System.out.println();
+
         //For gameZone to refresh
-        gameZone.revalidate();
         while (true) {
+            //Make random order
+            gameZone.revalidate();
             for (int i = boardSingle.length - 1 - 1; i >= 0; i--) {
                 int index = (int) (Math.random() * i);
                 JButton temp = boardSingle[i];
                 boardSingle[i] = boardSingle[index];
                 boardSingle[index] = temp;
                 //System.out.println(i);
-                gameZone.add(boardSingle[i]);
             }
             //Check the sum of inversion is even or odd
             int inversion = inversion(boardSingle)%2;
             //polarity in two dimensional system
             int polarity = ((rows-1)+(rows-1))%2;
             if(inversion==polarity){
-                //Store JButton array to JButton[][]
-                storeInTwoDimensionalArray(boardSingle);
+                System.out.println("Get array[] in shuffle:");
+                for (int i = 0; i < boardSingle.length-1; i++) {
+                    System.out.print(boardSingle[i].getText()+" ");
+                    gameZone.add(boardSingle[i]);
+                }
+                System.out.println();
                 break;
             }
         }
@@ -138,7 +134,67 @@ public class Board implements ActionListener {
         }
         return inversion;
     }
-    public JButton[][] printBoardByTwoDimensionalArray(int rows){
+
+    public JButton[] getBoardSingle() {
+        return boardSingle;
+    }
+
+    public int getRows() {
+        return rows;
+    }
+
+    public JPanel getGameZone() {
+        return gameZone;
+    }
+
+    public void storeInTwoDimensionalArray(JButton[] buttonArray){
+        for(JButton button : buttonArray){
+            if(button!=null)
+                System.out.print(button.getText()+" ");
+        }
+        System.out.println();
+        buttons = new JButton[rows][rows];
+        for (int i = 0; i <rows ; i++) {
+            for (int j = 0; j < rows; j++) {
+                buttons[i][j] = buttonArray[rows*i+j];
+                if(i!=(rows-1)||j!=(rows-1)) {
+                    System.out.print("[" + i + "][" + j + "] " + buttons[i][j].getText()+" ");
+                    buttons[i][j].addActionListener(this);
+                }
+            }
+        }
+        System.out.println();
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        for (int i = 0; i <buttons.length ; i++) {
+            for (int j = 0; j <buttons.length ; j++) {
+                if(e.getSource()==buttons[i][j]){
+                    System.out.print("Listener: [" + i + "][" + j + "] " + buttons[i][j].getText()+" ");
+
+                }
+                if(i+1<=buttons.length-1 && j+1<=buttons.length-1){
+                    if(buttons[i+1][j] == null){
+                        JButton temp = buttons[i][j];
+                        buttons[i][j] = null;
+                        buttons[i+1][j] = temp;
+                    }
+                }
+            }
+
+        }
+    }
+
+    public JButton[][] getButtons() {
+        return buttons;
+    }
+
+
+}
+
+/*
+ public JButton[][] printBoardByTwoDimensionalArray(int rows){
 
         int number = rows * rows;
         JButton[][] board = new JButton[rows][rows];
@@ -173,39 +229,16 @@ public class Board implements ActionListener {
         }
     }
 
-    public JButton[] getBoardSingle() {
-        return boardSingle;
-    }
 
-    public int getRows() {
-        return rows;
-    }
-
-    public JPanel getGameZone() {
-        return gameZone;
-    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        for(JButton button : boardSingle){
-            if(e.getSource()==button){
-                button.setForeground(Color.RED);
+        for(JButton[] buttons : buttons){
+            for (int i = 0; i < rows ; i++) {
+                if(e.getSource()==buttons[i]){
+                    buttons[i].setForeground(Color.RED);
+                }
             }
-        }
-    }
 
-    public void storeInTwoDimensionalArray(JButton[] buttonArray){
-        buttonsInDimensionalArray = new JButton[rows][rows];
-        for (int i = 0; i <rows ; i++) {
-            for (int j = 0; j < rows; j++) {
-                buttonsInDimensionalArray[i][j] = buttonArray[rows*i+j];
-                if(i!=(rows-1)||j!=(rows-1))
-                    System.out.println("["+i+"] ["+j+"]"+buttonsInDimensionalArray[i][j].getText());
-            }
         }
-    }
-
-    public JButton[][] getButtonsInDimensionalArray() {
-        return buttonsInDimensionalArray;
-    }
-}
+    }*/
