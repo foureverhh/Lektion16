@@ -18,7 +18,7 @@ public class Control implements ActionListener {
     public Control(){
         board = new Board();
         //buttonArray = board.getBoardSingle();
-        buttons = board.getButtons();
+        //buttons = board.getButtons();
         //Without pressing "New game", then not shuffled yet two dimensional array not set up
         if(buttons!=null) {
          //addListener(buttons);
