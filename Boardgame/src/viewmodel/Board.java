@@ -49,7 +49,7 @@ public class Board implements ActionListener { //implements MouseListener{
         frame = new JFrame("Enjoy the game!");
         label = new JLabel("Input rows:");
         banner = new JLabel();
-        rowsInput = new JTextField(10);
+        rowsInput = new JTextField(5);
         newGame = new JButton("New Game");
         reset = new JButton("Reset");
         controlPanel = new JPanel();
@@ -96,11 +96,17 @@ public class Board implements ActionListener { //implements MouseListener{
         frame.setLayout(new BorderLayout());
         frame.add(controlPanel, BorderLayout.NORTH);
         frame.add(scrollPane, BorderLayout.CENTER);
-        banner.setSize(400,200);
+        banner.setSize(200,200);
         frame.add(banner, BorderLayout.SOUTH);
 
-        showImages();
-        frame.setSize(800, 800);
+        //Add banner
+        timer = new Timer(5000, l -> {
+                    showImages();
+        });
+        timer.setRepeats(true);
+        timer.start();
+
+        frame.setSize(400, 400);
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setVisible(true);
@@ -230,19 +236,13 @@ public class Board implements ActionListener { //implements MouseListener{
             SwingWorker<Icon,Void> imageLoader =new SwingWorker<Icon, Void>() {
             @Override
             protected Icon doInBackground() throws Exception {
-
                 ImageIcon imageIcon = null;
-
                 System.out.println("Load images");
-
-                    imageIndex = (imageIndex + 1) % urls.length;
-                    BufferedImage image = ImageIO.read(urls[imageIndex]);
-                    System.out.println(imageIndex);
-                    imageIcon = new ImageIcon(image);
-
-                    return imageIcon;
-
-
+                imageIndex = (imageIndex + 1) % urls.length;
+                BufferedImage image = ImageIO.read(urls[imageIndex]);
+                System.out.println(imageIndex);
+                imageIcon = new ImageIcon(image);
+                return imageIcon;
             }
 
             @Override
