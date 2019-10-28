@@ -20,8 +20,9 @@ public class Board implements ActionListener { //implements MouseListener{
     private JButton newGame;
     private JButton reset;
     private JPanel controlPanel;
-    private JScrollPane scrollPane;
+    private JPanel bannerZone;
     private JPanel gameZone;
+    private JScrollPane scrollPane;
     private JButton[] boardSingle;
     private int rows = 4;
     private int imageIndex = 0;
@@ -37,7 +38,7 @@ public class Board implements ActionListener { //implements MouseListener{
                         new URL("https://photojournal.jpl.nasa.gov/jpeg/PIA18906.jpg"),
                         new URL("https://live.staticflickr.com/1948/44335552035_5d2afd2a74_b.jpg"),
                         new URL("https://upload.wikimedia.org/wikipedia/commons/a/aa/Polarlicht_2.jpg"),
-                        new URL("https://cdn.pixabay.com/photo/2018/10/28/10/04/background-image-3778266_960_720.jpg")
+                        new URL("http://www.google.com/logos/doodles/2015/googles-new-logo-5078286822539264.3-hp2x.gif")
                 };
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -93,11 +94,14 @@ public class Board implements ActionListener { //implements MouseListener{
 
         scrollPane = new JScrollPane(gameZone);
 
+        bannerZone = new JPanel();
+        banner.setSize(100,50);
+        bannerZone.add(banner,new FlowLayout(FlowLayout.CENTER));
+
         frame.setLayout(new BorderLayout());
         frame.add(controlPanel, BorderLayout.NORTH);
         frame.add(scrollPane, BorderLayout.CENTER);
-        banner.setSize(200,200);
-        frame.add(banner, BorderLayout.SOUTH);
+        frame.add(bannerZone, BorderLayout.SOUTH);
 
         //Add banner
         timer = new Timer(5000, l -> {
@@ -106,6 +110,7 @@ public class Board implements ActionListener { //implements MouseListener{
         timer.setRepeats(true);
         timer.start();
 
+        //Show all components
         frame.setSize(400, 400);
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -121,9 +126,6 @@ public class Board implements ActionListener { //implements MouseListener{
         gameZone.setLayout(new GridLayout(rows, rows));
         boardSingle = new JButton[rows * rows];
         System.out.println("Print, " + boardSingle.length);
-        //To make board repaint for reset
-        //gameZone.repaint();
-        //for (int i = 0; i < boardSingle.length-1 ; i++) {
         for (int i = 0; i < boardSingle.length; i++) {
             boardSingle[i] = new JButton("" + (i + 1));
             if (i == boardSingle.length - 1) {
@@ -158,15 +160,13 @@ public class Board implements ActionListener { //implements MouseListener{
             if (inversion == polarity) {
                 gameOn = true;
                 System.out.println("Get array[] in shuffle:");
-                //for (int i = 0; i < boardSingle.length-1; i++) {
                for (int i = 0; i < boardSingle.length - 1; i++) {
                     System.out.print(boardSingle[i].getText() + " ");
-                   // boardSingle[i].addActionListener(this);
                     gameZone.add(boardSingle[i]);
                 }
                 gameZone.add(boardSingle[boardSingle.length - 1]);
-              gameZone.validate();
-              gameZone.repaint();
+                gameZone.validate();
+                gameZone.repaint();
                 System.out.println("boardSingle"+boardSingle.length);
                 break;
             }
@@ -200,6 +200,7 @@ public class Board implements ActionListener { //implements MouseListener{
 
     public boolean checkWin(JButton[] boardSingle) {
         boolean win = true;
+        //Compare text and index
         for (int i = 0; i < boardSingle.length - 1; i++) {
             if (boardSingle[i].getText().compareTo("" + (i + 1)) != 0) {
                 win = false;
@@ -216,8 +217,6 @@ public class Board implements ActionListener { //implements MouseListener{
         }
         gameZone.repaint();
         gameZone.revalidate();
-        System.out.println("Update runs");
-
     }
 
     public int inversion(JButton[] boardSingle) {
@@ -240,6 +239,7 @@ public class Board implements ActionListener { //implements MouseListener{
                 System.out.println("Load images");
                 imageIndex = (imageIndex + 1) % urls.length;
                 BufferedImage image = ImageIO.read(urls[imageIndex]);
+                image = resizeImage(image,200,50);
                 System.out.println(imageIndex);
                 imageIcon = new ImageIcon(image);
                 return imageIcon;
@@ -250,12 +250,21 @@ public class Board implements ActionListener { //implements MouseListener{
                 try {
                     banner.setIcon(get());
                 } catch (InterruptedException e) {
-                    banner.setText("Failed to load pic");
+                    banner.setText("Failed loading pic"+imageIndex);
                 } catch (ExecutionException e) {
-                    banner.setText("Failed to load pic");
+                    banner.setText("Failed to load pic"+imageIndex);
                 }
             }
         };
             imageLoader.execute();
+    }
+
+    public BufferedImage resizeImage(Image scr,int width,int height){
+        BufferedImage resizedImage = new BufferedImage(200,200,BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = resizedImage.createGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g2.drawImage(scr, 0, 0, 200, 200, null);
+        g2.dispose();
+        return resizedImage;
     }
 }
