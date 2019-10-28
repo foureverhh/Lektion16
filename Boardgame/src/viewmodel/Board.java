@@ -1,6 +1,8 @@
 package viewmodel;
 
 import com.sun.scenario.effect.impl.sw.java.JSWColorAdjustPeer;
+import sun.audio.AudioPlayer;
+import sun.audio.AudioStream;
 import sun.tools.jconsole.Worker;
 
 import javax.imageio.ImageIO;
@@ -8,6 +10,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.ExecutionException;
@@ -30,8 +35,8 @@ public class Board implements ActionListener { //implements MouseListener{
     private Timer timer;
     //To valid and invalid listener added on printBoard
     private boolean gameOn;
-    URL[] urls;
 
+    private URL[] urls;
     {
         try {
             urls = new URL[]{
@@ -70,9 +75,11 @@ public class Board implements ActionListener { //implements MouseListener{
 
 
         reset.addActionListener(l -> {
+            playSoundEffect("Resources/Banana Peel Slip Zip-SoundBible.com-803276918.wav");
             try {
                 rows = Integer.parseInt(rowsInput.getText());
                 if(rows <2){
+
                     throw new Exception("Number too small");
                 }
                 //Remove all old buttons
@@ -84,11 +91,18 @@ public class Board implements ActionListener { //implements MouseListener{
 
                 System.out.println("Reset, rows:" + rows + "boardSingle length: " + boardSingle.length);
             }catch (Exception e){
+                playSoundEffect("Resources/Slap-SoundMaster13-49669815.wav");
+                Timer timer = new Timer(300,soundListener->{
+                    playSoundEffect("Resources/No Dear-SoundBible.com-223285016.wav");
+                });
+                timer.setRepeats(false);
+                timer.start();
                 JOptionPane.showMessageDialog(null,"Only an integer larger than 1 is accepted");
             }
         });
 
         newGame.addActionListener(l -> {
+            playSoundEffect("Resources/Banana Peel Slip Zip-SoundBible.com-803276918.wav");
             shuffleBoardByArray(boardSingle);
         });
 
@@ -179,6 +193,7 @@ public class Board implements ActionListener { //implements MouseListener{
             for (int i = 0; i < boardSingle.length; i++) {
                 if (e.getSource() == boardSingle[i]) {
                     if ((i == indexOfEmpty + 1 && (indexOfEmpty + 1) % rows != 0) || (i == indexOfEmpty - 1 && indexOfEmpty % rows != 0) || i == indexOfEmpty + rows || i == indexOfEmpty - rows) {
+                        playSoundEffect("Resources/Banana Peel Slip Zip-SoundBible.com-803276918.wav");
                         //swap board
                         JButton temp = boardSingle[i];
                         boardSingle[i] = boardSingle[indexOfEmpty];
@@ -188,11 +203,14 @@ public class Board implements ActionListener { //implements MouseListener{
                         updateBoard(boardSingle);
                         System.out.println("event listener, rows: " + rows + ", board size: " + boardSingle.length + ",indexOfEmpty: " + indexOfEmpty);
                         break;
+                    }else{
+                        playSoundEffect("Resources/Beep-SoundBible.com-923660219.wav");
                     }
                 }
             }
             if (checkWin(boardSingle)) {
                 gameOn = false;
+                playSoundEffect("Resources/Ta Da-SoundBible.com-1884170640.wav");
                 JOptionPane.showMessageDialog(gameZone, "You win!", "Congratulation", JOptionPane.INFORMATION_MESSAGE);
             }
         }
@@ -266,5 +284,15 @@ public class Board implements ActionListener { //implements MouseListener{
         g2.drawImage(scr, 0, 0, 200, 200, null);
         g2.dispose();
         return resizedImage;
+    }
+
+    public void playSoundEffect(String file){
+        try {
+            InputStream inputStream = new FileInputStream(file);
+            AudioStream audioStream = new AudioStream(inputStream);
+            AudioPlayer.player.start(audioStream);
+        } catch (IOException e) {
+            System.out.println("Sound effect "+file+" not found.");
+        }
     }
 }
